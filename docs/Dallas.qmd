@@ -1,0 +1,336 @@
+
+---
+title: "Dallas"
+author: "Samane Afshari"
+format: html
+editor: visual
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r}
+#| include: false
+
+library(tidycensus)
+library(tigris)
+library(tidyverse)
+library(sf)
+library(ggplot2)
+library(scales)
+library(dplyr)
+library(stringr)
+library(forcats)
+
+options(tigris_use_cache = TRUE)#| include: false
+```
+
+# Population Density Landscapes
+The landscape classification map reveals a highly decentralized metropolitan structure. Most of the Dallas-Fort Worth region is classified as exurban or low-density suburban landscape, while higher-density urban tracts are concentrated in a relatively compact core around Dallas and adjacent municipalities. This pattern reflects the extensive outward growth that has characterized the region over recent decades. Although urban areas occupy only a small share of the metropolitan land area, they contain a substantial concentration of population and economic activity. The map demonstrates how population density declines rapidly as distance from the urban core increases, producing a metropolitan area characterized by extensive suburban development and a broad exurban fringe.
+
+
+```{r}
+# census_api_key(""51b09e0aa87b1b3a4521e4b1cb12e2ae4f8b1a61"", install = TRUE)
+# Dallas MSA boundary
+cbsa_dallas <- core_based_statistical_areas(year = 2020, cb = TRUE)
+
+dallas_msa_boundary <- cbsa_dallas %>%
+  filter(str_detect(NAME, "Dallas")) %>%
+  st_transform(3083)
+
+# 2020 Census tract population
+tract_pop_dallas <- get_decennial(
+  geography = "tract",
+  variables = "P1_001N",
+  state = "TX",
+  year = 2020,
+  sumfile = "pl",
+  geometry = TRUE
+) %>%
+  st_transform(3083)
+
+# Keeping tracts inside Dallas MSA
+dallas_tract_population <- tract_pop_dallas %>%
+  st_filter(dallas_msa_boundary, .predicate = st_intersects) %>%
+  rename(population = value)
+
+# Calculating area and density
+dallas_density_data <- dallas_tract_population %>%
+  mutate(
+    area_km2 = as.numeric(st_area(geometry)) / 1000000,
+    density_km2 = population / area_km2,
+    landscape = case_when(
+      density_km2 < 250 ~ "Exurban",
+      density_km2 >= 250 & density_km2 < 550 ~ "Suburban low",
+      density_km2 >= 550 & density_km2 < 800 ~ "Suburban high",
+      density_km2 >= 800 & density_km2 < 1900 ~ "Urban low",
+      density_km2 >= 1900 ~ "Urban high"
+    ),
+    landscape = factor(
+      landscape,
+      levels = c(
+        "Exurban",
+        "Suburban low",
+        "Suburban high",
+        "Urban low",
+        "Urban high"
+      )
+    )
+  )
+
+# Landscape map
+dallas_landscape_map <- ggplot(dallas_density_data) +
+  geom_sf(aes(fill = landscape), color = NA) +
+  theme_void() +
+  labs(
+    title = "Population-density landscapes in the Dallas-Fort Worth MSA",
+    subtitle = "2020 Census tracts classified using density thresholds",
+    fill = "Landscape"
+  )
+
+ggsave(
+  "figures/dallas_landscape_map.png",
+  dallas_landscape_map,
+  width = 9,
+  height = 7,
+  dpi = 300
+)
+
+print(dallas_landscape_map)
+```
+# # Spatial Distribution of Income
+The income map shows considerable variation in median household income across the metropolitan area. Higher-income tracts are concentrated in selected suburban corridors and neighborhoods surrounding the urban core, while lower-income tracts are more common in parts of the central city and older inner-ring communities. Rather than following a simple center-to-periphery pattern, income is distributed unevenly throughout the region, suggesting the coexistence of affluent and disadvantaged communities within relatively close proximity. This spatial variation highlights the importance of examining socioeconomic conditions at the neighborhood scale rather than relying solely on metropolitan averages.
+
+```{r}
+# ACS variables for Dallas
+acs_vars_dallas <- c(
+  median_income = "B19013_001",
+  total_poverty = "B17001_001",
+  poverty_count = "B17001_002"
+)
+
+# 2020 ACS tract-level data
+acs_2020_dallas <- get_acs(
+  geography = "tract",
+  variables = acs_vars_dallas,
+  state = "TX",
+  year = 2020,
+  survey = "acs5",
+  geometry = FALSE
+) %>%
+  select(GEOID, variable, estimate) %>%
+  pivot_wider(names_from = variable, values_from = estimate) %>%
+  mutate(
+    poverty_rate = poverty_count / total_poverty * 100
+  )
+
+# Join ACS data to Dallas tract boundaries
+dallas_acs_data <- dallas_density_data %>%
+  left_join(acs_2020_dallas, by = "GEOID")
+
+# Dallas income map
+dallas_income_map <- ggplot(dallas_acs_data) +
+  geom_sf(aes(fill = median_income), color = NA) +
+  scale_fill_viridis_c(labels = dollar) +
+  theme_void() +
+  labs(
+    title = "Median household income by Census tract",
+    subtitle = "Dallas-Fort Worth MSA, 2016–2020 ACS 5-year estimates",
+    fill = "Income"
+  )
+
+ggsave(
+  "figures/dallas_income_map.png",
+  dallas_income_map,
+  width = 9,
+  height = 7,
+  dpi = 300
+)
+
+print(dallas_income_map)
+```
+# Income Differences Across Landscapes
+The relationship between population density and income is further illustrated by the landscape-based income comparison. Median household income increases steadily from approximately $61,700 in Urban High landscapes to more than $80,900 in Suburban Low landscapes. Suburban High and Suburban Low areas exhibit the highest median incomes in the region, while Urban High landscapes display the lowest. These findings suggest that many higher-income households are concentrated in lower-density suburban environments characterized by larger housing units, newer development, and greater residential space.
+The nearly $20,000 difference between Urban High and Suburban Low landscapes indicates a substantial socioeconomic gradient across settlement types. While dense urban areas provide important employment, transportation, and cultural amenities, they also contain a larger share of lower-income households. In contrast, suburban communities appear to capture a greater concentration of economic resources. This pattern is consistent with broader trends observed in many U.S. metropolitan areas, where suburbanization has been associated with increasing residential sorting by income.
+
+```{r}
+dallas_income_summary <- dallas_acs_data %>%
+  st_drop_geometry() %>%
+  group_by(landscape) %>%
+  summarize(
+    median_income = median(median_income, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    landscape = fct_reorder(landscape, median_income)
+  )
+
+dallas_income_chart <- ggplot(
+  dallas_income_summary,
+  aes(x = landscape, y = median_income)
+) +
+  geom_col(width = 0.7, fill = "steelblue") +
+  geom_text(
+    aes(label = dollar(median_income)),
+    vjust = -0.4,
+    size = 4
+  ) +
+  scale_y_continuous(
+    labels = dollar,
+    expand = expansion(mult = c(0, 0.08))
+  ) +
+  labs(
+    title = "Median Household Income",
+    subtitle = "Dallas-Fort Worth metropolitan area",
+    x = NULL,
+    y = "Median household income"
+  ) +
+  theme_minimal(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold"),
+    axis.text.x = element_text(face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+
+print(dallas_income_chart)
+
+ggsave(
+  "figures/dallas_income_by_landscape.png",
+  plot = dallas_income_chart,
+  width = 8,
+  height = 5,
+  dpi = 300
+)
+```
+
+# Urban Population Structure
+The urban population pyramid provides additional insight into the demographic composition of Dallas-Fort Worth's urban core. The largest shares of the urban population are concentrated in the young adult and working-age cohorts, particularly ages 25-34 and 35-44. This pattern suggests that urban areas attract and retain individuals during their prime working years, likely reflecting proximity to employment centers, educational opportunities, and urban amenities.
+At the same time, the pyramid shows relatively smaller proportions of older adults, particularly those over age 75, compared with the large working-age population. The presence of substantial child populations in the 0-14 age groups indicates that urban neighborhoods are not exclusively populated by young professionals but also contain a significant number of families. Overall, the age structure resembles that of a relatively young and economically active population, supporting the role of the urban core as a center of employment, residential development, and demographic growth within the broader metropolitan region.
+
+```{r}
+# Population pyramid: age-sex ACS data for Dallas
+
+age_vars_dallas <- load_variables(2020, "acs5", cache = TRUE) %>%
+  filter(str_detect(name, "^B01001_"))
+
+# Download age-sex data
+age_data_dallas <- get_acs(
+  geography = "tract",
+  table = "B01001",
+  state = "TX",
+  year = 2020,
+  survey = "acs5",
+  geometry = FALSE
+)
+
+# Join with Dallas landscape categories
+age_data_dallas <- age_data_dallas %>%
+  inner_join(
+    dallas_density_data %>%
+      st_drop_geometry() %>%
+      dplyr::select(GEOID, landscape),
+    by = "GEOID"
+  )
+```
+
+
+
+```{r}
+dallas_age_pyramid <- age_data_dallas %>%
+  filter(variable != "B01001_001") %>%
+  mutate(
+    sex = case_when(
+      variable %in% paste0("B01001_", sprintf("%03d", 3:25)) ~ "Male",
+      variable %in% paste0("B01001_", sprintf("%03d", 27:49)) ~ "Female"
+    ),
+    age_group = case_when(
+      variable %in% c("B01001_003", "B01001_027") ~ "0-4",
+      variable %in% c("B01001_004", "B01001_028") ~ "5-9",
+      variable %in% c("B01001_005", "B01001_029") ~ "10-14",
+      variable %in% c("B01001_006", "B01001_030") ~ "15-17",
+      variable %in% c("B01001_007", "B01001_031") ~ "18-19",
+      variable %in% c("B01001_008", "B01001_009", "B01001_010",
+                      "B01001_032", "B01001_033", "B01001_034") ~ "20-24",
+      variable %in% c("B01001_011", "B01001_012",
+                      "B01001_035", "B01001_036") ~ "25-34",
+      variable %in% c("B01001_013", "B01001_014",
+                      "B01001_037", "B01001_038") ~ "35-44",
+      variable %in% c("B01001_015", "B01001_016",
+                      "B01001_039", "B01001_040") ~ "45-54",
+      variable %in% c("B01001_017", "B01001_018", "B01001_019",
+                      "B01001_041", "B01001_042", "B01001_043") ~ "55-64",
+      variable %in% c("B01001_020", "B01001_021",
+                      "B01001_044", "B01001_045") ~ "65-74",
+      variable %in% c("B01001_022", "B01001_023",
+                      "B01001_046", "B01001_047") ~ "75-84",
+      variable %in% c("B01001_024", "B01001_025",
+                      "B01001_048", "B01001_049") ~ "85+"
+    )
+  ) %>%
+  filter(!is.na(sex), !is.na(age_group))
+```
+
+# 
+```{r}
+age_levels_dallas <- c(
+  "0-4", "5-9", "10-14", "15-17", "18-19",
+  "20-24", "25-34", "35-44", "45-54",
+  "55-64", "65-74", "75-84", "85+"
+)
+
+dallas_pyramid_data <- dallas_age_pyramid %>%
+  mutate(
+    broad_landscape = case_when(
+      landscape %in% c("Urban low", "Urban high") ~ "Urban",
+      landscape %in% c("Suburban low", "Suburban high") ~ "Suburban",
+      TRUE ~ NA_character_
+    ),
+    age_group = factor(age_group, levels = age_levels_dallas)
+  ) %>%
+  filter(!is.na(broad_landscape)) %>%
+  group_by(broad_landscape, sex, age_group) %>%
+  summarize(
+    population = sum(estimate, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  group_by(broad_landscape) %>%
+  mutate(
+    percent = population / sum(population) * 100,
+    percent_plot = ifelse(sex == "Male", -percent, percent)
+  ) %>%
+  ungroup()
+```
+
+#
+
+```{r}
+dallas_urban_plot <- dallas_pyramid_data %>%
+  filter(broad_landscape == "Urban") %>%
+  ggplot(aes(x = percent_plot, y = age_group, fill = sex)) +
+  geom_col(width = 0.8) +
+  scale_x_continuous(labels = function(x) paste0(abs(x), "%")) +
+  coord_cartesian(xlim = c(-8, 8)) +
+  labs(
+    title = "Urban Population Pyramid",
+    subtitle = "Dallas-Fort Worth metropolitan area",
+    x = "Share of urban population",
+    y = "Age group",
+    fill = "Sex"
+  ) +
+  theme_minimal()
+
+print(dallas_urban_plot)
+
+ggsave(
+  "figures/dallas_urban_population_pyramid.png",
+  dallas_urban_plot,
+  width = 8,
+  height = 6,
+  dpi = 300
+)
+```
+#
+
+
