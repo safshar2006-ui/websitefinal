@@ -1,7 +1,7 @@
 ---
 title: "Mapping Urban and Suburban Space in the Houston MSA"
 author: "Samane Afshari"
-format: pdf
+format: html
 editor: visual
 
 execute:
