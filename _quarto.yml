@@ -1,21 +1,28 @@
 project:
   type: website
+  output-dir: docs
+
 
 website:
-  title: "websitefinal"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
-      - about.qmd
+      - text: "Home"
+        href: index.qmd
+
+      - text: "Houston Portfolio"
+        href: houston.qmd
+
+      - text: "CV"
+        href: cv/Samane.pdf
+
+    right:
+      - icon: github
+        href: https://github.com/safshar2006-ui
+
+      - icon: envelope
+        href: mailto:s.afshar2006@gmail.com
 
 format:
   html:
-    theme:
-      - cosmo
-      - brand
-    css: styles.css
-    toc: true
-
-editor: visual
-
+    theme: cosmo
+    toc: false

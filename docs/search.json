@@ -1,0 +1,51 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Samane Afshar",
+    "section": "",
+    "text": "I am a Ph.D. student in Planning and Public Affairs at the University of Oregon. My research focuses on urban climate governance, sustainability, and local policy implementation."
+  },
+  {
+    "objectID": "index.html#education",
+    "href": "index.html#education",
+    "title": "Samane Afshar",
+    "section": "Education",
+    "text": "Education\nUniversity of Oregon\nPh.D. in Planning and Public Affairs"
+  },
+  {
+    "objectID": "index.html#research-interests",
+    "href": "index.html#research-interests",
+    "title": "Samane Afshar",
+    "section": "Research Interests",
+    "text": "Research Interests\nUrban climate governance\nSustainability policy\nLocal environmental planning"
+  },
+  {
+    "objectID": "index.html#experience",
+    "href": "index.html#experience",
+    "title": "Samane Afshar",
+    "section": "Experience",
+    "text": "Experience"
+  },
+  {
+    "objectID": "index.html#graduate-employee-university-of-oregon",
+    "href": "index.html#graduate-employee-university-of-oregon",
+    "title": "Samane Afshar",
+    "section": "Graduate Employee, University of Oregon",
+    "text": "Graduate Employee, University of Oregon"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "houston.html",
+    "href": "houston.html",
+    "title": "Mapping Urban and Suburban Space in the Houston MSA",
+    "section": "",
+    "text": "Introduction\nHouston is selected for this project because it is one of the largest and fastest-growing metropolitan areas in the United States. Unlike older monocentric cities that are organized around a single dense downtown core, Houston exhibits extensive suburban expansion and multiple activity centers connected through highways and car-oriented infrastructure. This makes Houston an appropriate case for examining the spatial distribution of urban, suburban, and exurban landscapes through Census tract population density classifications.\nThe landscape map demonstrates that the highest-density urban tracts are concentrated near central Houston and surrounding inner-city neighborhoods. Urban and suburban tracts extend outward along major transportation corridors, while exurban landscapes dominate the outer metropolitan fringe. The overall pattern reflects Houston’s large spatial footprint, continued suburban expansion, and relatively low-density metropolitan growth compared to older northeastern cities.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nVisualizing Median Houshold Income by Landscape Density Threshhhold\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nInterpretation\nThe figures suggest that Houston’s landscape pattern reflects both urban concentration and outward suburban expansion. The population-density map shows dense urban tracts clustered near the metropolitan core, while exurban areas dominate the outer edges of the MSA. This pattern is consistent with Houston’s decentralized, highway-oriented growth, where development extends far beyond the central city.\nThe income map and bar chart show that median household income is not highest in the densest urban areas. Instead, suburban low-density areas have the highest median income, while urban high-density areas have the lowest median income. This suggests that wealthier households are more concentrated in lower-density suburban settings, while denser urban neighborhoods include more lower-income populations.\nThe population pyramids show that both urban and suburban areas have large working-age populations and their composition is very close, but suburban areas appear to have stronger family-age and older adult cohorts. Overall, the analysis shows that Houston’s urban-suburban structure is not only spatial, but also socioeconomic and demographic.\n\n\nLink to Github\nhttps://github.com/safshar2006-ui/replication-samane.git"
+  }
+]

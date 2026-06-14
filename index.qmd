@@ -1,11 +1,33 @@
 ---
-title: "websitefinal"
+title: "Samane Afshar"
+about:
+  template: jolla
+  image: images/profile.jpg
+  links:
+    - icon: github
+      text: GitHub
+      href: https://github.com/YOUR-USERNAME
+    - icon: envelope
+      text: Email
+      href: mailto:s.afshar2006@gmail.com
+    - text: CV
+      href: cv/Samane.pdf
 ---
+I am a Ph.D. student in Planning and Public Affairs at the University of Oregon. My research focuses on urban climate governance, sustainability, and local policy implementation.
 
-This is a Quarto website.
+## Education
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+**University of Oregon**  
+Ph.D. in Planning and Public Affairs
 
-```{r}
-1 + 1
-```
+## Research Interests
+
+Urban climate governance  
+Sustainability policy  
+Local environmental planning  
+
+
+## Experience
+
+Graduate Employee, University of Oregon  
+---
