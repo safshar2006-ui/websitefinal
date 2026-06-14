@@ -16,7 +16,7 @@ website:
         href: houston.qmd
 
       - text: "Dallas Portfolio"
-        href: Dallas.qmd
+        href: Dallas.pdf
 
     right:
       - icon: github
