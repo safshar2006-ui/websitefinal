@@ -9,11 +9,14 @@ website:
       - text: "Home"
         href: index.qmd
 
+      - text: "CV"
+        href: cv/Samane.pdf
+        
       - text: "Houston Portfolio"
         href: houston.qmd
 
-      - text: "CV"
-        href: cv/Samane.pdf
+      - text: "Dallas Portfolio"
+        href: Dallas.qmd
 
     right:
       - icon: github

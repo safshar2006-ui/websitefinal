@@ -13,7 +13,7 @@ about:
     - text: CV
       href: cv/Samane.pdf
 ---
-I am a Ph.D. student in Planning and Public Affairs at the University of Oregon. My research focuses on urban climate governance, sustainability, and energy transistion. 
+Ph.D. student in Planning and Public Affairs at the University of Oregon. My research focuses on urban climate governance, sustainability, and energy transistion. 
 
 ## Education
 
