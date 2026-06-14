@@ -38,7 +38,7 @@ dir.create("figures", showWarnings = FALSE)
 
 # Introduction
 
-Houston is selected for this project because it is one of the largest and fastest-growing metropolitan areas in the United States. Unlike older monocentric cities that are organized around a single dense downtown core, Houston exhibits extensive suburban expansion and multiple activity centers connected through highways and car-oriented infrastructure. This makes Houston an appropriate case for examining the spatial distribution of urban, suburban, and exurban landscapes through Census tract population density classifications.
+Houston is one of the largest and fastest-growing metropolitan areas in the United States. Unlike older monocentric cities that are organized around a single dense downtown core, Houston exhibits extensive suburban expansion and multiple activity centers connected through highways and car-oriented infrastructure. This makes Houston an appropriate case for examining the spatial distribution of urban, suburban, and exurban landscapes through Census tract population density classifications.
 
 The landscape map demonstrates that the highest-density urban tracts are concentrated near central Houston and surrounding inner-city neighborhoods. Urban and suburban tracts extend outward along major transportation corridors, while exurban landscapes dominate the outer metropolitan fringe. The overall pattern reflects Houston’s large spatial footprint, continued suburban expansion, and relatively low-density metropolitan growth compared to older northeastern cities.
 
